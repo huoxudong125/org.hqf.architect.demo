@@ -6,7 +6,7 @@ import java.nio.ByteOrder;
 public class MurmurHashStrategy implements HashStrategy {
 
     @Override
-    public int getHashCode(Object origin) {
+    public long getHashCode(Object origin) {
 
         ByteBuffer buf = ByteBuffer.wrap(origin.toString().getBytes());
         int seed = 0x1234ABCD;

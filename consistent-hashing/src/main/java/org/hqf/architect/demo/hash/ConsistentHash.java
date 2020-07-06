@@ -2,6 +2,9 @@ package org.hqf.architect.demo.hash;
 
 import org.hqf.architect.demo.hash.stat.HashStrategy;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class ConsistentHash<T> {
@@ -12,7 +15,7 @@ public class ConsistentHash<T> {
     private final int nodeVirtualFactor;
 
     // 存储虚拟节点的hash值到真实节点的映射
-    private final SortedMap<Integer, T> circle = new TreeMap<Integer, T>();
+    private final SortedMap<Long, T> circle = new TreeMap<Long, T>();
 
     public ConsistentHash(int nodeVirtualFactor,
                           Collection<T> nodes,
@@ -32,7 +35,7 @@ public class ConsistentHash<T> {
              * 虚拟node一般是均衡分布在环上的,数据存储在顺时针方向的虚拟node上
              */
             String nodeStr = node.toString() + i;
-            int hashcode = nodeStr.hashCode();
+            Long hashcode = new Long(nodeStr.hashCode());
 //            System.out.println("hashcode:" + hashcode);
             circle.put(hashcode, node);
 
@@ -53,16 +56,17 @@ public class ConsistentHash<T> {
         if (circle.isEmpty())
             return null;
 //        int hash = key.hashCode();// node 用String来表示,获得node在哈希环中的hashCode
-        int hash;
+        Long hash;
         if(hashStrategy==null){
-            hash = key.hashCode();// node 用String来表示,获得node在哈希环中的hashCode
+            hash = new Long(key.hashCode());// node 用String来表示,获得node在哈希环中的hashCode
         }else {
             hash = hashStrategy.getHashCode(key);
         }
+        hash=hash(hash.toString(), 0);
         System.out.println("hashcode----->:" + hash);
         if (!circle.containsKey(hash)) {
             //数据映射在两台虚拟机器所在环之间,就需要按顺时针方向寻找机器
-            SortedMap<Integer, T> tailMap = circle.tailMap(hash);
+            SortedMap<Long, T> tailMap = circle.tailMap(hash);
             hash = tailMap.isEmpty() ? circle.firstKey() : tailMap.firstKey();
         }
         return circle.get(hash);
@@ -76,12 +80,40 @@ public class ConsistentHash<T> {
         return nodeVirtualFactor;
     }
 
-    public Map<Integer, T> getMap() {
+    public Map<Long, T> getMap() {
         return circle;
     }
 
 
+    private Long hash(String nodeName, int number) {
+        byte[] digest = md5(nodeName);
+        return (((long) (digest[3 + number * 4] & 0xFF) << 24)
+                | ((long) (digest[2 + number * 4] & 0xFF) << 16)
+                | ((long) (digest[1 + number * 4] & 0xFF) << 8)
+                | (digest[number * 4] & 0xFF))
+                & 0xFFFFFFFFL;
+    }
 
+    /**
+     * md5加密
+     *
+     * @param str
+     * @return
+     */
+    public byte[] md5(String str) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.reset();
+            md.update(str.getBytes("UTF-8"));
+            return md.digest();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
 }
 
