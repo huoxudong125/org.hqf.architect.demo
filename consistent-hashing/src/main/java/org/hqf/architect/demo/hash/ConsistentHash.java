@@ -28,7 +28,7 @@ public class ConsistentHash<T> {
              */
             String nodeStr = node.toString() + i;
             int hashcode = nodeStr.hashCode();
-            System.out.println("hashcode:" + hashcode);
+//            System.out.println("hashcode:" + hashcode);
             circle.put(hashcode, node);
 
         }
@@ -48,7 +48,7 @@ public class ConsistentHash<T> {
         if (circle.isEmpty())
             return null;
         int hash = key.hashCode();// node 用String来表示,获得node在哈希环中的hashCode
-        System.out.println("hashcode----->:" + hash);
+//        System.out.println("hashcode----->:" + hash);
         if (!circle.containsKey(hash)) {
             //数据映射在两台虚拟机器所在环之间,就需要按顺时针方向寻找机器
             SortedMap<Integer, T> tailMap = circle.tailMap(hash);
@@ -69,31 +69,7 @@ public class ConsistentHash<T> {
         return circle;
     }
 
-    /*
-     * 查看表示整个哈希环中各个虚拟节点位置
-     */
-    public void testBalance() {
-        Set<Integer> sets = circle.keySet();//获得TreeMap中所有的Key
-        SortedSet<Integer> sortedSets = new TreeSet<Integer>(sets);//将获得的Key集合排序
-        for (Integer hashCode : sortedSets) {
-            System.out.println(hashCode);
-        }
 
-        System.out.println("----each location 's distance are follows: ----");
-        /*
-         * 查看相邻两个hashCode的差值
-         */
-        Iterator<Integer> it = sortedSets.iterator();
-        Iterator<Integer> it2 = sortedSets.iterator();
-        if (it2.hasNext())
-            it2.next();
-        long keyPre, keyAfter;
-        while (it.hasNext() && it2.hasNext()) {
-            keyPre = it.next();
-            keyAfter = it2.next();
-            System.out.println(keyAfter - keyPre);
-        }
-    }
 
 
 }

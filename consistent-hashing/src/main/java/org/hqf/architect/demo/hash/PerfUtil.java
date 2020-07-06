@@ -1,7 +1,6 @@
 package org.hqf.architect.demo.hash;
 
-import java.util.IntSummaryStatistics;
-import java.util.Map;
+import java.util.*;
 
 public class PerfUtil {
 
@@ -33,6 +32,32 @@ public class PerfUtil {
         System.out.println(String.format("最小值：%d,（%.2f%%）", min, 100.0 * min / average));
         System.out.println(String.format("极差：%d,（%.2f%%）", range, 100.0 * range / average));
         System.out.println(String.format("标准差：%.2f,（%.2f%%）", standardDeviation, 100.0 * standardDeviation / average));
+    }
+
+    /*
+     * 查看表示整个哈希环中各个虚拟节点位置
+     */
+    public static void testBalance(Map  circle) {
+        Set<Integer> sets = circle.keySet();//获得TreeMap中所有的Key
+        SortedSet<Integer> sortedSets = new TreeSet<Integer>(sets);//将获得的Key集合排序
+        for (Integer hashCode : sortedSets) {
+            System.out.println(hashCode);
+        }
+
+        System.out.println("----each location 's distance are follows: ----");
+        /*
+         * 查看相邻两个hashCode的差值
+         */
+        Iterator<Integer> it = sortedSets.iterator();
+        Iterator<Integer> it2 = sortedSets.iterator();
+        if (it2.hasNext())
+            it2.next();
+        long keyPre, keyAfter;
+        while (it.hasNext() && it2.hasNext()) {
+            keyPre = it.next();
+            keyAfter = it2.next();
+            System.out.println(keyAfter - keyPre);
+        }
     }
 
 }

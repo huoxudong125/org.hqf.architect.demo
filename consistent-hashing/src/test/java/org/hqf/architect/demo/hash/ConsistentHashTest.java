@@ -2,35 +2,54 @@ package org.hqf.architect.demo.hash;
 
 import org.junit.Test;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 public class ConsistentHashTest {
 
-    @Test
-    public void test(){
-        Set<String> nodes = new HashSet<String>();
-        nodes.add("A");
-        nodes.add("B");
-        nodes.add("C");
+    private static final String prefix = "D";
 
-        ConsistentHash<String> consistentHash = new ConsistentHash<String>(2, nodes);
-        consistentHash.add("D");
+    private static final long maxKeyCount = 1000000;
+
+
+
+    @Test
+    public void test() {
+
+        Random random=new Random();
+
+        Set<String> nodes = new HashSet<String>();
+        for (int i = 1; i <= 10; i++) {
+            nodes.add(String.format("192.168.1.%d", i));
+        }
+
+        ConsistentHash<String> consistentHash = new ConsistentHash<String>(200, nodes);
 
         System.out.println("hash circle size: " + consistentHash.getSize());
-        System.out.println("location of each node are follows: ");
-        consistentHash.testBalance();
 
-        String node =consistentHash.get("apple");
-        System.out.println("node----------->:"+node);
+
+        HashMap<String, Integer> statisticMap = new HashMap<>();
+        for (long i = 0; i < maxKeyCount; i++) {
+            String node = consistentHash.get(prefix + random.nextInt());
+//            System.out.println("node----------->:" + node);
+
+            Integer sum = 0;
+
+            if (statisticMap.containsKey(node)) {
+                sum = statisticMap.get(node);
+            } else {
+                statisticMap.put(node, sum);
+            }
+            statisticMap.put(node, sum + 1);
+        }
+
 
         System.out.println(" ============================ ");
-        for (Map.Entry<Integer, String> integerStringEntry : consistentHash.getMap().entrySet()) {
-            System.out.println("integerStringEntry = " + integerStringEntry);
+        for (Map.Entry<String,Integer > integerStringEntry : statisticMap.entrySet()) {
+            System.out.println("keyValue = " + integerStringEntry);
         }
-//        PerfUtil.analyze(,consistentHash.getSize(),nodes.size());
+
+        PerfUtil.analyze(statisticMap, consistentHash.getSize(), nodes.size());
     }
 
 }
