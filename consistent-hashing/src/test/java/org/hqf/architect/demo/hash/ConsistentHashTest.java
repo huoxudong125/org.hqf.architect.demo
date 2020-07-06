@@ -1,5 +1,6 @@
 package org.hqf.architect.demo.hash;
 
+import org.hqf.architect.demo.hash.stat.MurmurHashStrategy;
 import org.junit.Test;
 
 import java.util.*;
@@ -16,14 +17,14 @@ public class ConsistentHashTest {
     @Test
     public void test() {
 
-        Random random=new Random();
+        Random random=new Random(System.currentTimeMillis());
 
         Set<String> nodes = new HashSet<String>();
         for (int i = 1; i <= 10; i++) {
             nodes.add(String.format("192.168.1.%d", i));
         }
 
-        ConsistentHash<String> consistentHash = new ConsistentHash<String>(200, nodes);
+        ConsistentHash<String> consistentHash = new ConsistentHash<String>(200000, nodes, new MurmurHashStrategy());
 
         System.out.println("hash circle size: " + consistentHash.getSize());
 
@@ -31,7 +32,7 @@ public class ConsistentHashTest {
         HashMap<String, Integer> statisticMap = new HashMap<>();
         for (long i = 0; i < maxKeyCount; i++) {
             String node = consistentHash.get(prefix + random.nextInt());
-//            System.out.println("node----------->:" + node);
+            System.out.println("node----------->:" + node);
 
             Integer sum = 0;
 

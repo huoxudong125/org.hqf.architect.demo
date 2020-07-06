@@ -1,9 +1,12 @@
 package org.hqf.architect.demo.hash;
 
+import org.hqf.architect.demo.hash.stat.HashStrategy;
+
 import java.util.*;
 
 public class ConsistentHash<T> {
 
+    private final HashStrategy hashStrategy;
 
     // 实际节点的虚拟副本因子,实际节点个数 * numberOfVirtual =虚拟节点个数
     private final int nodeVirtualFactor;
@@ -12,7 +15,9 @@ public class ConsistentHash<T> {
     private final SortedMap<Integer, T> circle = new TreeMap<Integer, T>();
 
     public ConsistentHash(int nodeVirtualFactor,
-                          Collection<T> nodes) {
+                          Collection<T> nodes,
+                          HashStrategy hashStrategy){
+        this.hashStrategy=hashStrategy;
         this.nodeVirtualFactor = nodeVirtualFactor;
         for (T node : nodes) {
             add(node);
@@ -47,8 +52,14 @@ public class ConsistentHash<T> {
     public T get(Object key) {
         if (circle.isEmpty())
             return null;
-        int hash = key.hashCode();// node 用String来表示,获得node在哈希环中的hashCode
-//        System.out.println("hashcode----->:" + hash);
+//        int hash = key.hashCode();// node 用String来表示,获得node在哈希环中的hashCode
+        int hash;
+        if(hashStrategy==null){
+            hash = key.hashCode();// node 用String来表示,获得node在哈希环中的hashCode
+        }else {
+            hash = hashStrategy.getHashCode(key);
+        }
+        System.out.println("hashcode----->:" + hash);
         if (!circle.containsKey(hash)) {
             //数据映射在两台虚拟机器所在环之间,就需要按顺时针方向寻找机器
             SortedMap<Integer, T> tailMap = circle.tailMap(hash);
