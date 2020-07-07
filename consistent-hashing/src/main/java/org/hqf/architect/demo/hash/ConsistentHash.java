@@ -11,16 +11,20 @@ public class ConsistentHash<T> {
 
     private final HashStrategy hashStrategy;
 
-    // 实际节点的虚拟副本因子,实际节点个数 * numberOfVirtual =虚拟节点个数
+    /**
+     * 实际节点的虚拟副本因子,实际节点个数 * numberOfVirtual =虚拟节点个数
+     */
     private final int nodeVirtualFactor;
 
-    // 存储虚拟节点的hash值到真实节点的映射
+    /**
+     * 存储虚拟节点的hash值到真实节点的映射
+     */
     private final SortedMap<Long, T> circle = new TreeMap<Long, T>();
 
     public ConsistentHash(int nodeVirtualFactor,
                           Collection<T> nodes,
-                          HashStrategy hashStrategy){
-        this.hashStrategy=hashStrategy;
+                          HashStrategy hashStrategy) {
+        this.hashStrategy = hashStrategy;
         this.nodeVirtualFactor = nodeVirtualFactor;
         for (T node : nodes) {
             add(node);
@@ -34,8 +38,9 @@ public class ConsistentHash<T> {
              * 不同的虚拟节点(i不同)有不同的hash值,但都对应同一个实际机器node
              * 虚拟node一般是均衡分布在环上的,数据存储在顺时针方向的虚拟node上
              */
-            String nodeStr = node.toString() + i;
-            Long hashcode = new Long(nodeStr.hashCode());
+            String nodeStr = node.toString() + "#VN#" + i;
+//            Long hashcode = new Long(nodeStr.hashCode());
+            Long hashcode = hash(nodeStr, 0);
 //            System.out.println("hashcode:" + hashcode);
             circle.put(hashcode, node);
 
@@ -43,8 +48,9 @@ public class ConsistentHash<T> {
     }
 
     public void remove(T node) {
-        for (int i = 0; i < nodeVirtualFactor; i++)
+        for (int i = 0; i < nodeVirtualFactor; i++) {
             circle.remove((node.toString() + i).hashCode());
+        }
     }
 
     /*
@@ -57,12 +63,11 @@ public class ConsistentHash<T> {
             return null;
 //        int hash = key.hashCode();// node 用String来表示,获得node在哈希环中的hashCode
         Long hash;
-        if(hashStrategy==null){
+        if (hashStrategy == null) {
             hash = new Long(key.hashCode());// node 用String来表示,获得node在哈希环中的hashCode
-        }else {
+        } else {
             hash = hashStrategy.getHashCode(key);
         }
-        hash=hash(hash.toString(), 0);
         System.out.println("hashcode----->:" + hash);
         if (!circle.containsKey(hash)) {
             //数据映射在两台虚拟机器所在环之间,就需要按顺时针方向寻找机器
