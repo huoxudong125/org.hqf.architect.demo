@@ -53,23 +53,26 @@ public class ConsistentHash<T> {
         }
     }
 
-    /*
+    /**
      * 获得一个最近的顺时针节点,根据给定的key 取Hash
      * 然后再取得顺时针方向上最近的一个虚拟节点对应的实际节点
      * 再从实际节点中取得 数据
      */
-    public T get(Object key) {
-        if (circle.isEmpty())
+    public T getNode(Object key) {
+        if (circle.isEmpty()) {
             return null;
+        }
 //        int hash = key.hashCode();// node 用String来表示,获得node在哈希环中的hashCode
         Long hash;
         if (hashStrategy == null) {
-            hash = new Long(key.hashCode());// node 用String来表示,获得node在哈希环中的hashCode
+            // node 用String来表示,获得node在哈希环中的hashCode
+            hash = new Long(key.hashCode());
         } else {
             hash = hashStrategy.getHashCode(key);
         }
-        System.out.println("hashcode----->:" + hash);
+//        System.out.println("hashcode----->:" + hash);
         if (!circle.containsKey(hash)) {
+            //得到大于该Hash值的所有Map
             //数据映射在两台虚拟机器所在环之间,就需要按顺时针方向寻找机器
             SortedMap<Long, T> tailMap = circle.tailMap(hash);
             hash = tailMap.isEmpty() ? circle.firstKey() : tailMap.firstKey();

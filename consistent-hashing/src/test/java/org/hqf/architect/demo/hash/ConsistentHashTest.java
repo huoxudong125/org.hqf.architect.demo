@@ -10,29 +10,31 @@ public class ConsistentHashTest {
 
     private static final String prefix = "D";
 
-    private static final long maxKeyCount = 1000000;
+    private static final int maxKeyCount = 1000000;
 
 
 
     @Test
     public void test() {
 
-        Random random=new Random(System.currentTimeMillis());
-
         Set<String> nodes = new HashSet<String>();
         for (int i = 1; i <= 10; i++) {
             nodes.add(String.format("192.168.1.%d", i));
         }
 
-        ConsistentHash<String> consistentHash = new ConsistentHash<String>(200000, nodes, new MurmurHashStrategy());
+        ConsistentHash<String> consistentHash = new ConsistentHash<String>(20, nodes, new MurmurHashStrategy());
 
         System.out.println("hash circle size: " + consistentHash.getSize());
+
+        for (Map.Entry<Long, String> entry : consistentHash.getMap().entrySet()) {
+            System.out.println("entry = " + entry);
+        }
 
 
         HashMap<String, Integer> statisticMap = new HashMap<>();
         for (long i = 0; i < maxKeyCount; i++) {
-            String node = consistentHash.get(prefix + random.nextInt());
-            System.out.println("node----------->:" + node);
+            String node = consistentHash.getNode(prefix + i);
+//            System.out.println("node----------->:" + node);
 
             Integer sum = 0;
 
@@ -50,7 +52,9 @@ public class ConsistentHashTest {
             System.out.println("keyValue = " + integerStringEntry);
         }
 
-        PerfUtil.analyze(statisticMap, consistentHash.getSize(), nodes.size());
+        PerfUtil.analyze(statisticMap, maxKeyCount, nodes.size());
+
+
     }
 
 }

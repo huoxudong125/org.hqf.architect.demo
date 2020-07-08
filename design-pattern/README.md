@@ -1,3 +1,2 @@
-# org.hqf.architect.pattern
-
+#第三周 设计模式 组合模式实例代码
 组合模式示例，其实用过微软winform技术的人对这个层次结构都很清楚。
