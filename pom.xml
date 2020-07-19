@@ -19,6 +19,7 @@
     <modules>
         <module>design-pattern</module>
         <module>consistent-hashing</module>
+        <module>rest-perf-tester</module>
     </modules>
 
     <dependencies>
