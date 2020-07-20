@@ -54,3 +54,8 @@ Percentage of the requests served within a certain time (ms)
 从这个报告中可以看到服务器的一些基本信息，以及请求的统计信息。比较重要的指标是 Requests per second 每秒钟完成的请求数量，不严格的说也就是我们的平时说的 QPS。
 
 ab 测试是专为 http 请求设计的，因此 ab 的其他参数和 curl 的参数比较类似，也可以指定 http method 以及 cookies 等参数。
+
+
+### akka 
+
+https://doc.akka.io/docs/akka-http/current/introduction.html
