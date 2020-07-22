@@ -2,7 +2,6 @@ package org.hqf.architect.demo.pattern;
 
 import org.hqf.architect.demo.pattern.controls.*;
 import org.hqf.architect.demo.pattern.controls.base.ContainerControl;
-import org.hqf.architect.pattern.controls.*;
 
 /**
  * @author huoquanfu
