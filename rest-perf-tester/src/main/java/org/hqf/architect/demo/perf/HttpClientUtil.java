@@ -84,6 +84,10 @@ public class HttpClientUtil {
         // 设置 Http 连接超时为5秒
         httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(5000);
 
+        //设置代理
+//        HostConfiguration config = httpClient.getHostConfiguration();
+//        config.setProxy("127.0.0.1", 8888);
+
         /* 2 生成 GetMethod 对象并设置参数 */
         GetMethod getMethod = new GetMethod(url);
         // 设置 get 请求超时为 5 秒
